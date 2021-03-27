@@ -30,7 +30,7 @@ class Client(object):
         if scope.lower() == 'private':
             nonce = str(get_current_timestamp())
             payload = f'{nonce}{method.upper()}{endpoint}'
-            if method is 'GET' and query:
+            if method == 'GET' and query:
                 payload += '?' + urlencode(query)
             elif query:
                 payload += json.dumps(query)
@@ -898,7 +898,7 @@ class Client(object):
         :return a list contains all info after modify the trigger order
         """
 
-        if _type is 'stop' or _type is 'takeProfit':
+        if _type == 'stop' or _type == 'takeProfit':
             query = {
                 'size': size,
                 'triggerPrice': triggerPrice,
