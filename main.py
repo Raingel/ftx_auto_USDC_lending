@@ -23,16 +23,19 @@ coin = input('INPUT_YOUR_LENDING_COIN: ')
 
 
 def lending(client, coin):
-
     balance = client.get_private_wallet_single_balance(coin)['total']
     # client.set_private_margin_lending_offer('USD', usd_available, 2.283e-05)
     rate = client.get_private_margin_lending_rates()
     for i in range(len(rate)):
         if rate[i]['coin'] == coin:
             USD_rate = rate[i]['estimate']
-            print(rate[i]['estimate'])
+            #print(rate[i]['estimate'])
+    USD_rate = 0.00000001
     client.set_private_margin_lending_offer(coin, balance, USD_rate)
+    print ("Coin: {}, Balance: {}, rate: {}".format(coin, balance, USD_rate))
 
+
+lending(client, coin)
 
 schedule.every().hour.at(":50").do(lending, client, coin)
 # schedule.every(0.1).minutes.do(lending, client)
