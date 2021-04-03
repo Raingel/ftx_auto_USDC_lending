@@ -1072,3 +1072,31 @@ class Client(object):
         }
 
         return self._send_request('private', 'POST', f"spot_margin/offers", query)
+
+    def get_daily_borrowed_amounts(self, coin):
+        """
+        https://docs.ftx.com/#submit-lending-offer
+        :param coin: the lending coin to query
+        :param size: the amount of the request for the lend coin (Cancel for 0)
+        :param rate: the rate wanna offer
+        :return a list contains result
+        """
+        daily_borrowed_amounts_l = self._send_request('private', 'GET', f"spot_margin/borrow_summary")
+        for i in range(len(daily_borrowed_amounts_l)):
+                if daily_borrowed_amounts_l[i]['coin'] == coin:
+                        return daily_borrowed_amounts_l[i]['size']
+        return 0
+
+    def get_lending_history(self, coin):
+        """
+        https://docs.ftx.com/#submit-lending-offer
+        :param coin: the lending coin to query
+        :param size: the amount of the request for the lend coin (Cancel for 0)
+        :param rate: the rate wanna offer
+        :return a list contains result
+        """
+        daily_borrowed_amounts_l = self._send_request('private', 'GET', f"spot_margin/lending_history")
+        for i in range(len(daily_borrowed_amounts_l)):
+                if daily_borrowed_amounts_l[i]['coin'] == coin:
+                        return daily_borrowed_amounts_l[i]
+        return 0

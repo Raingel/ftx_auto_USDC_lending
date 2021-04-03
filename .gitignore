@@ -1,0 +1,12 @@
+
+ftx_auto_lend.ipynb
+.ipynb_checkpoints/ftx_auto_lend-checkpoint.ipynb
+FTX/__pycache__/__init__.cpython-36.pyc
+FTX/__pycache__/client.cpython-36.pyc
+FTX/__pycache__/client.cpython-38.pyc
+FTX/__pycache__/constants.cpython-36.pyc
+FTX/__pycache__/helpers.cpython-36.pyc
+FTX/__pycache__/client.cpython-38.pyc
+FTX/__pycache__/client.cpython-38.pyc
+*.pyc
+FTX/__pycache__/client.cpython-38.pyc

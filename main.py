@@ -4,8 +4,24 @@ import math
 import urllib
 import schedule
 import time
-
+from datetime import datetime, timedelta
 from FTX.client import Client
+
+def now_time():
+	return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+def calc_year_rate(f):
+    return ((1+f)**24)**365
+def lending(client, coin, rate):
+    balance = client.get_private_wallet_single_balance(coin)['total']
+    # client.set_private_margin_lending_offer('USD', usd_available, 2.283e-05)
+    client.set_private_margin_lending_offer(coin, balance, rate)
+    last_proceeds_time = (datetime.strptime(client.get_lending_history(coin)['time'],'%Y-%m-%dT%H:%M:%S+00:00')+timedelta(hours=8)).strftime('%Y-%m-%dT%H:%M:%S')    
+    proceeds = client.get_lending_history(coin)['proceeds']
+    last_rate = client.get_lending_history(coin)['rate']*100
+    last_year_rate = (calc_year_rate(client.get_lending_history(coin)['rate'])-1)*100
+    print ("{} {}資產：: {}, 設定利率: {}, 前次收利時間{}, 前次收利總額{:f}, 前次時/年化報酬率{:f}%/{:.2f}%".format(now_time(), coin, balance, rate, last_proceeds_time, proceeds, last_rate, last_year_rate)) 
+	
+	
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(
@@ -14,30 +30,40 @@ logging.basicConfig(
     format='[%(asctime)s %(levelname)-8s] %(message)s',
     datefmt='%Y%m%d %H:%M:%S',
 )
-INPUT_YOUR_API_KEY1 = input('INPUT_YOUR_MAIN_ACCOUNT_API_KEY: ')
-INPUT_YOUR_API_SECRET1 = input('INPUT_YOUR_MAIN_ACCOUNT_API_SECRET: ')
-INPUT_YOUR_SUBACCOUNT_NAME1 = input('INPUT_YOUR_SUB_ACCOUNT_NAME: ')
+INPUT_YOUR_API_KEY1 = input('請輸入API金鑰(公鑰): ')
+
+INPUT_YOUR_API_SECRET1 = input('請輸入API金鑰(私鑰): ')
+
+INPUT_YOUR_SUBACCOUNT_NAME1 = input('請輸入子帳戶名稱(若無可留空): ')
 client = Client(INPUT_YOUR_API_KEY1, INPUT_YOUR_API_SECRET1,
                 INPUT_YOUR_SUBACCOUNT_NAME1)
-coin = input('INPUT_YOUR_LENDING_COIN: ')
+coin = input('請輸入貸出幣種(若留空，預設為USDT): ')
+if not coin:
+    print ('使用預設幣種USDT')
+    coin='USDT'
+    
+rate = input('請設定利率(若留空，預設為0.00000001): ')
+if not rate:
+    print ('使用預設利率0.00000001')
+    rate=0.00000001
+	
+	
+last_proceeds_time=(datetime.strptime(client.get_lending_history(coin)['time'],'%Y-%m-%dT%H:%M:%S+00:00')+timedelta(hours=8)).strftime('%Y-%m-%dT%H:%M:%S')
+print ('##################')
+print ('純液男借金程式 rev 210403')
+print ('近24小時{}幣種借金額交易量: {}'.format(coin,client.get_daily_borrowed_amounts(coin)))
+print ('現有{}總值：{}'.format (coin, client.get_private_wallet_single_balance(coin)['total']))
+print ('前次收利時間為{}'.format(last_proceeds_time))
+print ('前次收利總額為{0:f}'.format(client.get_lending_history(coin)['proceeds']))
+print ('前次時報酬率為{0:f}%'.format(client.get_lending_history(coin)['rate']*100))
+print ('前次年化複利報酬率為{0:.2f}%'.format((calc_year_rate(client.get_lending_history(coin)['rate'])-1)*100))
+print ('##################')
 
 
-def lending(client, coin):
-    balance = client.get_private_wallet_single_balance(coin)['total']
-    # client.set_private_margin_lending_offer('USD', usd_available, 2.283e-05)
-    rate = client.get_private_margin_lending_rates()
-    for i in range(len(rate)):
-        if rate[i]['coin'] == coin:
-            USD_rate = rate[i]['estimate']
-            #print(rate[i]['estimate'])
-    USD_rate = 0.00000001
-    client.set_private_margin_lending_offer(coin, balance, USD_rate)
-    print ("Coin: {}, Balance: {}, rate: {}".format(coin, balance, USD_rate))
+print ("開始自動全投入借金")
+lending(client, coin, rate)
 
-
-lending(client, coin)
-
-schedule.every().hour.at(":50").do(lending, client, coin)
+schedule.every().hour.at(":50").do(lending, client, coin, rate)
 # schedule.every(0.1).minutes.do(lending, client)
 while True:
     schedule.run_pending()
