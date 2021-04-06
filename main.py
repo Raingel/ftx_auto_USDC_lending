@@ -20,17 +20,17 @@ def now_time():
 def calc_year_rate(f):
     return ((1+f)**24)**365
 def lending(client, coin, rate):
-    balance = client.get_private_wallet_single_balance(coin)['total']
-    # client.set_private_margin_lending_offer('USD', usd_available, 2.283e-05)
-    client.set_private_margin_lending_offer(coin, balance, rate)
     try:
+        balance = client.get_private_wallet_single_balance(coin)['total']
+        # client.set_private_margin_lending_offer('USD', usd_available, 2.283e-05)
+        client.set_private_margin_lending_offer(coin, balance, rate)
         last_proceeds_time = (datetime.strptime(client.get_lending_history(coin)['time'],'%Y-%m-%dT%H:%M:%S+00:00')+timedelta(hours=8)).strftime('%Y-%m-%dT%H:%M:%S')    
         proceeds = client.get_lending_history(coin)['proceeds']
         last_rate = client.get_lending_history(coin)['rate']*100
         last_year_rate = (calc_year_rate(client.get_lending_history(coin)['rate'])-1)*100
         print (">>{} 現有{}總值：: {}, 設定利率: {}, 前次收利時間{}, 前次收利總額為{:f}, 前次時/年化報酬率為{:f}%/{:.2f}%".format(now_time(), coin, balance, rate, last_proceeds_time, proceeds, last_rate, last_year_rate)) 
     except:
-        print ('{} 現有{}總值：: {}, 設定利率: {}'.format(now_time(), balance))
+        print ('>>{} 獲取過去資訊失敗'.format(now_time()))
         
 
 
@@ -84,7 +84,6 @@ for coin in coin_list:
         print ('>>前次年化複利報酬率為{0:.2f}%'.format((calc_year_rate(client.get_lending_history(coin)['rate'])-1)*100))
     except:
         print ('======幣種:{}======'.format(coin))
-        print ('>>現有{}總值：{}'.format (coin, client.get_private_wallet_single_balance(coin)['total']))
         print ('獲取過去資訊失敗')
 print ('####################')
 
