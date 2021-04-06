@@ -2,8 +2,6 @@
 # coding: utf-8
 
 # In[1]:
-
-
 import sys
 import logging
 import math
@@ -72,7 +70,8 @@ if not rate:
 
 
 print ('####################')
-print ('>>純液男借金程式 rev 210404')
+print ('>>純液男借金程式 rev 210406')
+print ('>>投資一定有風險，投資有賺有賠，投資前請詳閱公開說明書。')
 for coin in coin_list:
     try:
         last_proceeds_time=(datetime.strptime(client.get_lending_history(coin)['time'],'%Y-%m-%dT%H:%M:%S+00:00')+timedelta(hours=8)).strftime('%Y-%m-%dT%H:%M:%S')
