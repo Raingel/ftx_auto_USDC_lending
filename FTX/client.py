@@ -4,7 +4,7 @@ import json
 import requests
 import urllib
 from urllib.parse import urlencode
-
+from datetime import datetime, timedelta
 from .constants import *
 from .helpers import *
 
@@ -1095,7 +1095,8 @@ class Client(object):
         :param rate: the rate wanna offer
         :return a list contains result
         """
-        daily_borrowed_amounts_l = self._send_request('private', 'GET', f"spot_margin/lending_history")
+		
+        daily_borrowed_amounts_l = self._send_request('private', 'GET', f"spot_margin/lending_history", {"start_time":datetime.now().timestamp()-60*60})
         for i in range(len(daily_borrowed_amounts_l)):
                 if daily_borrowed_amounts_l[i]['coin'] == coin:
                         return daily_borrowed_amounts_l[i]
